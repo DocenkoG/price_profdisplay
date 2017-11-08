@@ -7,6 +7,8 @@
 *.3
 *.4
 *.5
+*.sublime-workspace
+*.sublime-project
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
