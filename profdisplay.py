@@ -154,6 +154,7 @@ def convert2csv( dealerName ):
         elif sheetName == 'LG'            : convert_sheet( book, sheetName)
         elif sheetName == 'NEC'           : convert_sheet( book, sheetName)
         elif sheetName == 'BENQ'          : convert_sheet( book, sheetName)
+        elif sheetName == 'SHARP'         : convert_sheet( book, sheetName)
         elif sheetName == 'Iiyama'        : convert_sheet( book, sheetName)
         elif sheetName == 'Philips'       : convert_sheet( book, sheetName)
         elif sheetName == 'ViewSonic'     : convert_sheet( book, sheetName)
