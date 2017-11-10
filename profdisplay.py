@@ -63,6 +63,8 @@ def convert_sheet( book, sheetName):
     data = bbbb.decode(encoding='cp1251')
     f2.write(data)
     f2.close()
+    if os.path.exists('c://AV_PROM/prices/profdisplay') : shutil.copy2( 'python.log', 'c://AV_PROM/prices/profdisplay/'+csvFName)
+
 
 
 
