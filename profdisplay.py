@@ -28,12 +28,12 @@ def convert_sheet( book, sheetName):
         i_last = i
         try:
             ccc = sh.cell(row=i, column= 2 )
-            if ccc.value == 'Категория дисплея' :                   # Заголовок таблицы
-                pass
-    
-            elif ccc.value == None  :                               # Пустая строка
+            if  ccc.value == None  :                                # Пустая строка
                 pass
                 #print( 'Пустая строка. i=', i )
+    
+            elif ccc.value[0:9] == 'Категория' :                    # Заголовок таблицы
+                pass
     
             else :                                                  # Информационная строка
                 impValues = getXlsxString(sh, i, in_columns_j)
@@ -43,7 +43,10 @@ def convert_sheet( book, sheetName):
                     for key in impValues.keys():
                         if shablon.find(key) >= 0 :
                             shablon = shablon.replace(key, impValues[key])
-                    if outColName == 'описание':    shablon = appendSensor( shablon, impValues)
+                    if   (outColName == 'описание') and ('тип_сенсора' in impValues) :
+                       shablon = appendSensor( shablon, impValues)
+                    elif (outColName == 'закупка') and ('*' in shablon) :
+                       shablon = str( 0.8 * float( impValues['продажа']) )
                     sss.append( quoted( shablon))
                 ssss.append(','.join(sss))
                     
@@ -72,13 +75,45 @@ def appendSensor( shablon, impValues):
 
 
 
+def currencyType( row, col, sheet ):
+    '''
+    Функция анализирует "формат ячейки" таблицы excel, является ли он "денежным"
+    и какая валюта указана в этом формате.
+    Распознаются не все валюты и способы их описания.
+    '''
+    c = sheet.cell( row=row, column=col )
+    '''                                                  # -- для XLS
+    xf = sheet.book.xf_list[c.xf_index]
+    fmt_obj = sheet.book.format_map[xf.format_key]
+    fmt_str = fmt_obj.format_str
+    '''                                                  # -- для XLSX
+    fmt_str = c.number_format
+
+    if 'р' in fmt_str:
+        val = 'RUB'
+    elif '\xa3' in fmt_str:
+        val = 'GBP'
+    elif chr(8364) in fmt_str:
+        val = 'EUR'
+    elif (fmt_str.find('USD')>=0) or (fmt_str.find('[$$')>=0) :
+        val = 'USD'
+    else:
+        val = ''
+    return val
+
+
+
 def getXlsxString(sh, i, in_columns_j):
     impValues = {}
     for item in in_columns_j.keys() :
+        j = in_columns_j[item]
         if item in ('закупка','продажа','цена') :
-            impValues[item] = getCellXlsx(row=i, col=in_columns_j[item], isDigit='Y', sheet=sh) 
+            impValues[item] = getCellXlsx(row=i, col=j, isDigit='Y', sheet=sh)
+            #print(sh, i, sh.cell( row=i, column=j).value, sh.cell(row=i, column=j).number_format, currencyType(sh, i, j))
+        elif item == 'валюта_по_формату':
+            impValues[item] = currencyType(row=i, col=j, sheet=sh)
         else:
-            impValues[item] = getCellXlsx(row=i, col=in_columns_j[item], isDigit='N', sheet=sh)
+            impValues[item] = getCellXlsx(row=i, col=j, isDigit='N', sheet=sh)
     return impValues
 
 
@@ -87,7 +122,7 @@ def config_read( cfgFName ):
     log.debug('Reading config ' + cfgFName )
     
     config = configparser.ConfigParser()
-    if os.path.exists(cfgFName):     config.read( cfgFName)
+    if os.path.exists(cfgFName):     config.read( cfgFName, encoding='utf-8')
     else : log.debug('Не найден файл конфигурации.')
 
     # в разделе [cols_in] находится список интересующих нас колонок и номера столбцов исходного файла
@@ -115,9 +150,15 @@ def convert2csv( dealerName ):
     sheetNames = book.get_sheet_names()
     for sheetName in sheetNames :                                # Организую цикл по страницам
         log.info('-------------------  '+sheetName +'  ----------')
-        if   sheetName == 'Samsung': convert_sheet( book, sheetName)
-        elif sheetName == 'LG'     : convert_sheet( book, sheetName)
-        elif sheetName == 'NEC'    : convert_sheet( book, sheetName)
+        if   sheetName == 'Samsung'       : convert_sheet( book, sheetName)
+        elif sheetName == 'LG'            : convert_sheet( book, sheetName)
+        elif sheetName == 'NEC'           : convert_sheet( book, sheetName)
+        elif sheetName == 'BENQ'          : convert_sheet( book, sheetName)
+        elif sheetName == 'Iiyama'        : convert_sheet( book, sheetName)
+        elif sheetName == 'Philips'       : convert_sheet( book, sheetName)
+        elif sheetName == 'ViewSonic'     : convert_sheet( book, sheetName)
+        elif sheetName == 'Panasonic'     : convert_sheet( book, sheetName)
+        elif sheetName == 'Проекторы Panasonic': convert_sheet( book, sheetName)
         #else : log.debug('Не конвертируем лист '+sheetName )
 
 
