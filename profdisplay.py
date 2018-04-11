@@ -11,6 +11,64 @@ import shutil
 import openpyxl                       # Для .xlsx
 # import xlrd                         # для .xls
 from   price_tools import getCellXlsx, quoted, dump_cell, currencyType, subInParentheses
+import requests
+
+
+
+def download( ):
+    retCode     = False
+    filename_new= 'new_profdisplay.xlsx'
+    filename_old= 'old_profdisplay.xlsx'
+    url_file    = 'http://displayprice.ru/price.xlsx'
+    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Language':'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3',
+               'Accept-Encoding':'gzip, deflate',
+               'Connection':'keep-alive',
+               'DNT':'1'
+              }    
+    try:
+        s = requests.Session()
+        #r = s.get(url_lk,  headers = headers) 
+        #print(r.text)                         # посмотреть исходный код страницы
+        '''
+        page = lxml.html.fromstring(r.text)
+        for ff in page.forms:                 # посмотреть список форм и их поля
+            print(ff.fields.keys())
+        form = page.forms[0]
+        form.fields['login'] = login
+        form.fields['pass'] = password
+        r = s.post(url_lk+ form.action, data=form.form_values())
+        print('       ==================================================')
+        #print('<<<',r.text,'>>>')
+
+        log.debug('Авторизация на %s   --- code=%d', url_lk, r.status_code)
+        '''
+        r = s.get(url_file)
+        log.debug('Загрузка файла %16d bytes   --- code=%d', len(r.content), r.status_code)
+        retCode = True
+        '''
+        s = requests.Session()
+        r = s.get(url_lk, auth=(login,password))  # ,headers = headers (И без него сработало, но где-то может понадобиться)
+        page = lxml.html.fromstring(r.text)
+        # data = {'USER_LOGIN':login, 'USER_PASSWORD':password})
+        log.debug('Авторизация на %s   --- code=%d', url_lk, r.status_code)
+        r = s.get(url_file)
+        log.debug('Загрузка файла %24d bytes   --- code=%d', len(r.content), r.status_code)
+        retCode = True
+        '''
+    except Exception as e:
+        log.debug('Exception: <' + str(e) + '>')
+
+    if os.path.exists( filename_new) and os.path.exists( filename_old): 
+        os.remove( filename_old)
+        os.rename( filename_new, filename_old)
+    if os.path.exists( filename_new) :
+        os.rename( filename_new, filename_old)
+    f2 = open(filename_new, 'wb')                                  #Теперь записываем файл
+    f2.write(r.content)
+    f2.close()
+    return retCode
 
 
 
@@ -152,16 +210,16 @@ def convert2csv( dealerName ):
     sheetNames = book.get_sheet_names()
     for sheetName in sheetNames :                                # Организую цикл по страницам
         log.info('-------------------  '+sheetName +'  ----------')
-        if   sheetName == 'Samsung'       : convert_sheet( book, sheetName)
-        elif sheetName == 'LG'            : convert_sheet( book, sheetName)
-        elif sheetName == 'NEC'           : convert_sheet( book, sheetName)
-        elif sheetName == 'BENQ'          : convert_sheet( book, sheetName)
-        elif sheetName == 'SHARP'         : convert_sheet( book, sheetName)
-        elif sheetName == 'Iiyama'        : convert_sheet( book, sheetName)
-        elif sheetName == 'Philips'       : convert_sheet( book, sheetName)
-        elif sheetName == 'ViewSonic'     : convert_sheet( book, sheetName)
-        elif sheetName == 'Panasonic'     : convert_sheet( book, sheetName)
-        elif sheetName == 'Проекторы Panasonic': convert_sheet( book, sheetName)
+        if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'LG'            : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'NEC'           : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'PHILIPS'       : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName)
+        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': convert_sheet( book, sheetName)
         #else : log.debug('Не конвертируем лист '+sheetName )
 
 
@@ -176,7 +234,9 @@ def make_loger():
 def main( dealerName):
     make_loger()
     log.info('         '+dealerName )
-    convert2csv( dealerName )
+    rc_download = download()
+    if rc_download==True or is_file_fresh( filename_new, 3):
+        convert2csv( dealerName )
     if os.path.exists( 'python.log') : shutil.copy2( 'python.log', 'c://AV_PROM/prices/' + dealerName +'/python.log')
     if os.path.exists( 'python.1'  ) : shutil.copy2( 'python.log', 'c://AV_PROM/prices/' + dealerName +'/python.1'  )
 
