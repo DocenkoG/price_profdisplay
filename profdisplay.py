@@ -72,9 +72,8 @@ def download( ):
 
 
 
-def convert_sheet( book, sheetName):
-    confName = ('cfg_'+sheetName.replace(' ','').replace('.','')+'.cfg').lower()
-    csvFName = ('csv_'+sheetName.replace(' ','').replace('.','')+'.csv').lower()
+def convert_sheet( book, sheetName, confName):
+    csvFName = confName.replace('cfg','csv')
     if not os.path.exists( confName ) :
         log.error( 'Нет файла конфигурации '+confName)
         return
@@ -86,10 +85,11 @@ def convert_sheet( book, sheetName):
         i_last = i
         try:
             ccc = sh.cell(row=i, column= 2 )
-            if  ccc.value == None  :                                # Пустая строка
-                pass
-                #print( 'Пустая строка. i=', i )
-    
+            cc2 = sh.cell(row=i, column= 11 )
+            if  ccc.value == None  or \
+                (confName=='cfg_проекторыpanasonic.cfg' and cc2.value==None) :  # Пустая строка
+                    pass
+                    #print( 'Пустая строка. i=', i )
             elif ccc.value[0:9] == 'Категория' :                    # Заголовок таблицы
                 pass
     
@@ -210,17 +210,21 @@ def convert2csv( dealerName ):
     sheetNames = book.get_sheet_names()
     for sheetName in sheetNames :                                # Организую цикл по страницам
         log.info('-------------------  '+sheetName +'  ----------')
-        if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'LG'            : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'NEC'           : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'PHILIPS'       : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName)
-        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': convert_sheet( book, sheetName)
-        #else : log.debug('Не конвертируем лист '+sheetName )
+        confName = ('cfg_'+sheetName.replace(' ','').replace('.','')+'.cfg').lower()
+        if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'LG'            : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'NEC'           : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'ПО NEC '       : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'PHILIPS'       : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': 
+                                                    convert_sheet( book, sheetName, confName)
+                                                    convert_sheet( book, sheetName, 'cfg_проект_акс_panas.cfg')
+        else : log.debug('Не конвертируем лист '+sheetName )
 
 
 
