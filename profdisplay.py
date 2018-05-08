@@ -81,21 +81,33 @@ def convert_sheet( book, sheetName, confName):
     in_columns_j, out_columns = config_read( confName )
     sh = book[sheetName]                                     # xlsx
     ssss = []
+    subgrp = ''
     for i in range(sh.min_row, sh.max_row) :
         i_last = i
         try:
-            ccc = sh.cell(row=i, column= 2 )
-            cc2 = sh.cell(row=i, column= 11 )
-            if  ccc.value == None  or \
-                (confName=='cfg_проекторыpanasonic.cfg' and cc2.value==None) :  # Пустая строка
-                    pass
-                    #print( 'Пустая строка. i=', i )
-            elif ccc.value[0:9] == 'Категория' :                    # Заголовок таблицы
-                pass
+            ccc =sh.cell(row=i, column=in_columns_j['категория'] )
+            cc2 =sh.cell(row=i, column= 11 )
+            '''
+            if  (sh.cell(row=i, column=in_columns_j['продажа'] ).value== None)        or \
+                (confName=='cfg_поnec.cfg' and sh.cell(row=i, column=3 ).value==None) or \
+                (confName=='cfg_проекторыpanasonic.cfg' and cc2.value==None)          or \
+                (confName=='cfg_проект_акс_panas.cfg'   and cc2.value!=None)       :  # ненужная строка
+                    continue
+            '''
+            if (('noblank' in in_columns_j.keys()) and (sh.cell(row=i, column=in_columns_j['noblank']).value!=None)) or \
+               (('blank'   in in_columns_j.keys()) and (sh.cell(row=i, column=in_columns_j['blank']  ).value==None)) :     # ненужная строка
+                continue
+            elif ccc.value!=None and ((ccc.value[0:9]=='Категория') or (ccc.value=='SOFTWARE SOLUTIONS')):  # Заголовок таблицы
+                continue
     
-            else :                                                  # Информационная строка
+            else :                                                                    # Информационная строка или подгруппа
                 impValues = getXlsxString(sh, i, in_columns_j)
-                sss = []                                            # формируемая строка для вывода в файл
+                if  confName=='cfg_проект_акс_panas.cfg' :                            # Для аксессуарров наследуем подгруппу
+                    if  impValues['категория'] == '' :
+                        impValues['категория'] = subgrp
+                    else :
+                        subgrp = impValues['категория']
+                sss = []                                                              # формируемая строка для вывода в файл
                 for outColName in out_columns.keys() :
                     shablon = out_columns[outColName]
                     for key in impValues.keys():
