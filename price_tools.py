@@ -31,10 +31,12 @@ def getCellXlsx(  row       # номер строки
         if (cellValue == None) : 
             ss = ''
         elif (cellType in ('n')) :                    # numeric
+            '''
             if int(cellValue) == cellValue:
                 ss = str(int(cellValue))
             else :
-                ss = str(cellValue)
+            '''
+            ss = str(cellValue)
         else :
             ss = str(cellValue)
     return ss
