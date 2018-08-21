@@ -102,7 +102,7 @@ def convert_sheet( book, sheetName, confName):
     
             else :                                                                    # Информационная строка или подгруппа
                 impValues = getXlsxString(sh, i, in_columns_j)
-                if  confName=='cfg_проект_акс_panas.cfg' :                            # Для аксессуарров наследуем подгруппу
+                if  confName[-7:-4] =='aks' :                                         # Для аксессуарров наследуем подгруппу
                     if  impValues['категория'] == '' :
                         impValues['категория'] = subgrp
                     else :
@@ -180,7 +180,10 @@ def getXlsxString(sh, i, in_columns_j):
     for item in in_columns_j.keys() :
         j = in_columns_j[item]
         if item in ('закупка','продажа','цена') :
-            impValues[item] = getCellXlsx(row=i, col=j, isDigit='Y', sheet=sh)
+            if getCellXlsx(row=i, col=j, isDigit='N', sheet=sh).find('по запросу') >=0 :
+                impValues[item] = '0.1'
+            else :
+                impValues[item] = getCellXlsx(row=i, col=j, isDigit='Y', sheet=sh)
             #print(sh, i, sh.cell( row=i, column=j).value, sh.cell(row=i, column=j).number_format, currencyType(sh, i, j))
         elif item == 'валюта_по_формату':
             impValues[item] = currencyType(row=i, col=j, sheet=sh)
@@ -225,7 +228,9 @@ def convert2csv( dealerName ):
         confName = ('cfg_'+sheetName.replace(' ','').replace('.','')+'.cfg').lower()
         if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'LG'            : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'NEC'           : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'NEC'           : 
+                                                    convert_sheet( book, sheetName, confName)
+                                                    convert_sheet( book, sheetName, 'cfg_nec_aks.cfg')
         elif sheetName.upper() == 'ПО NEC '       : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName, confName)
@@ -235,7 +240,7 @@ def convert2csv( dealerName ):
         elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': 
                                                     convert_sheet( book, sheetName, confName)
-                                                    convert_sheet( book, sheetName, 'cfg_проект_акс_panas.cfg')
+                                                    convert_sheet( book, sheetName, 'cfg_проекторыpanasonic_aks.cfg')
         else : log.debug('Не конвертируем лист '+sheetName )
 
 
