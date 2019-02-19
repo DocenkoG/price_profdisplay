@@ -133,8 +133,6 @@ def convert_sheet( book, sheetName, confName):
     data = bbbb.decode(encoding='cp1251')
     f2.write(data)
     f2.close()
-    if os.path.exists('c://AV_PROM/prices/profdisplay') : shutil.copy2( csvFName, 'c://AV_PROM/prices/profdisplay/'+csvFName)
-
 
 
 
@@ -258,8 +256,6 @@ def main( dealerName):
     rc_download = download()
     if rc_download==True or is_file_fresh( filename_new, 3):
         convert2csv( dealerName )
-    if os.path.exists( 'python.log') : shutil.copy2( 'python.log', 'c://AV_PROM/prices/' + dealerName +'/python.log')
-    if os.path.exists( 'python.1'  ) : shutil.copy2( 'python.log', 'c://AV_PROM/prices/' + dealerName +'/python.1'  )
 
 
 
