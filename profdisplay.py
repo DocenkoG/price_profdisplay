@@ -99,9 +99,12 @@ def convert_sheet( book, sheetName, confName):
                 continue
             elif ccc.value!=None and ((ccc.value[0:9]=='Категория') or (ccc.value=='SOFTWARE SOLUTIONS')):  # Заголовок таблицы
                 continue
-    
             else :                                                                    # Информационная строка или подгруппа
                 impValues = getXlsxString(sh, i, in_columns_j)
+                if confName == 'cfg_philips.cfg' and impValues['валюта_по_формату'] != 'USD':
+                    continue
+                elif confName == 'cfg_philips_rur.cfg' and impValues['валюта_по_формату'] != 'RUB':
+                    continue
                 if  confName[-7:-4] =='aks' :                                         # Для аксессуарров наследуем подгруппу
                     if  impValues['категория'] == '' :
                         impValues['категория'] = subgrp
@@ -223,8 +226,8 @@ def convert2csv( dealerName ):
     fileNameIn = 'new_'+dealerName+'.xlsx'
     book = openpyxl.load_workbook(filename = fileNameIn, read_only=False, keep_vba=False, data_only=False)
 #   book = xlrd.open_workbook( fileNameIn.encode('cp1251'), formatting_info=True)
-    sheetNames = book.get_sheet_names()
-    for sheetName in sheetNames :                                # Организую цикл по страницам
+#    sheetNames = book.sheetnames() #  .get_sheet_names()
+    for sheetName in book.sheetnames :                                # Организую цикл по страницам
         log.info('-------------------  '+sheetName +'  ----------')
         confName = ('cfg_'+sheetName.replace(' ','').replace('.','')+'.cfg').lower()
         if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName, confName)
@@ -236,7 +239,9 @@ def convert2csv( dealerName ):
         elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'PHILIPS'       : convert_sheet( book, sheetName, confName)
+        elif sheetName.upper() == 'PHILIPS'       :
+                                                    convert_sheet( book, sheetName, confName)
+                                                    convert_sheet( book, sheetName, 'cfg_philips_rur.cfg')
         elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': 
