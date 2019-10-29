@@ -235,7 +235,7 @@ def convert2csv( dealerName ):
         elif sheetName.upper() == 'NEC'           : 
                                                     convert_sheet( book, sheetName, confName)
                                                     convert_sheet( book, sheetName, 'cfg_nec_aks.cfg')
-        elif sheetName.upper() == 'ПО NEC '       : convert_sheet( book, sheetName, confName)
+                                                    convert_sheet( book, sheetName, 'cfg_nec_soft.cfg')
         elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName, confName)
