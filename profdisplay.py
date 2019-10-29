@@ -94,8 +94,10 @@ def convert_sheet( book, sheetName, confName):
                 (confName=='cfg_проект_акс_panas.cfg'   and cc2.value!=None)       :  # ненужная строка
                     continue
             '''
-            if (('noblank' in in_columns_j.keys()) and (sh.cell(row=i, column=in_columns_j['noblank']).value!=None)) or \
-               (('blank'   in in_columns_j.keys()) and (sh.cell(row=i, column=in_columns_j['blank']  ).value==None)) :     # ненужная строка
+            if not(          # Не строка нужной таблицы
+                (('nonblank' not in in_columns_j.keys()) or (sh.cell(row=i, column=in_columns_j['nonblank']).value!=None)) and
+                (('blank' not in in_columns_j.keys()) or (sh.cell(row=i, column=in_columns_j['blank']).value==None)
+                                                      or (sh.cell(row=i, column=in_columns_j['blank']).value==''))):
                 continue
             elif ccc.value!=None and ((ccc.value[0:9]=='Категория') or (ccc.value=='SOFTWARE SOLUTIONS')):  # Заголовок таблицы
                 continue
@@ -244,7 +246,7 @@ def convert2csv( dealerName ):
                                                     convert_sheet( book, sheetName, 'cfg_philips_rur.cfg')
         elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC': 
+        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC':              # больше не предоставляют
                                                     convert_sheet( book, sheetName, confName)
                                                     convert_sheet( book, sheetName, 'cfg_проекторыpanasonic_aks.cfg')
         else : log.debug('Не конвертируем лист '+sheetName )
