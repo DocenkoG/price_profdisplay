@@ -103,6 +103,8 @@ def convert_sheet( book, sheetName, confName):
                 continue
             else :                                                                    # Информационная строка или подгруппа
                 impValues = getXlsxString(sh, i, in_columns_j)
+                if (impValues['закупка'] == '0.1') or (impValues['закупка'] == '0'):
+                    impValues['закупка'] = impValues['продажа']
                 if confName == 'cfg_philips.cfg' and impValues['валюта_по_формату'] != 'USD':
                     continue
                 elif confName == 'cfg_philips_rur.cfg' and impValues['валюта_по_формату'] != 'RUB':
