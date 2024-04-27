@@ -234,23 +234,11 @@ def convert2csv( dealerName ):
     for sheetName in book.sheetnames :                                # Организую цикл по страницам
         log.info('-------------------  '+sheetName +'  ----------')
         confName = ('cfg_'+sheetName.replace(' ','').replace('.','')+'.cfg').lower()
-        if   sheetName.upper() == 'SAMSUNG'       : convert_sheet( book, sheetName, confName)
+        if   sheetName.upper() == 'ВСЕ LCD ДИСПЛЕИ' : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'LG'            : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'NEC'           : 
-                                                    convert_sheet( book, sheetName, confName)
-                                                    convert_sheet( book, sheetName, 'cfg_nec_aks.cfg')
-                                                    convert_sheet( book, sheetName, 'cfg_nec_soft.cfg')
-        elif sheetName.upper() == 'BENQ'          : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'SHARP'         : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'IIYAMA'        : convert_sheet( book, sheetName, confName)
         elif sheetName.upper() == 'PHILIPS'       :
                                                     convert_sheet( book, sheetName, confName)
                                                     convert_sheet( book, sheetName, 'cfg_philips_rur.cfg')
-        elif sheetName.upper() == 'VIEWSONIC'     : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'PANASONIC'     : convert_sheet( book, sheetName, confName)
-        elif sheetName.upper() == 'ПРОЕКТОРЫ PANASONIC':              # больше не предоставляют
-                                                    convert_sheet( book, sheetName, confName)
-                                                    convert_sheet( book, sheetName, 'cfg_проекторыpanasonic_aks.cfg')
         else : log.debug('Не конвертируем лист '+sheetName )
 
 
