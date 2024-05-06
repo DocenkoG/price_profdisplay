@@ -143,6 +143,7 @@ def convert_excel2csv(cfg):
             impValues = getXlsxString(sheet, i, in_cols_j)                # xlsx
             #impValues = getXlsString(sheet, i, in_cols_j)                # xls
             #print( impValues )
+            impValues['особенности'] = impValues['особенности'].encode('cp1251', errors='replace').decode('cp1251')
             ccc1 = sheet.cell(row=i, column=in_cols_j['закупка']).value
 
             for outColName in out_template.keys() :
